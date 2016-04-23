@@ -8,7 +8,8 @@ public class DBUtil {
 	private static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
 	private static final String MYSQL_URL = "jdbc:mysql://127.0.0.1:3306/mysql";
 	private static final String MYSQL_USER = "root";
-	private static final String MYSQL_PASSWORD = "fabkip";
+	//KIP: FürdenServerMussHierNochDasPWrein, lokal habe ich kein PW drin
+	private static final String MYSQL_PASSWORD = "";
 
 	/**
 	 * Opens a database connection to mysql database. User has to make sure that
