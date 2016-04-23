@@ -62,6 +62,8 @@ public class FasRestImpl {
 		JSONObject jObj = new JSONObject();
 		jObj.put("Test1", 555);
 		jObj.put("Test2", 333);
+		int i = 33;
+		System.out.println(i);
 //		return Response.status(200).
 //				entity("Super. \nHat funktioniert.").build();
 		String result = "@Produces(\"test/json\") Output: \n\nF to C Converter Output: \n\n" + jObj;
