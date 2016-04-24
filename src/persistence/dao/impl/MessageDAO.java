@@ -21,19 +21,18 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 	
 	public Message create(String text) throws SQLException {
 		Message msg = new Message();
-		Connection conn = DBUtil.getConnection();
-		PreparedStatement statement;
-		ResultSet result;
+		Connection conn = null;
+		try{
+			conn = DBUtil.getConnection();
+			ResultSet result;
 
-		try {
-			statement = conn.prepareStatement("INSERT INTO fas_message (TEXT) VALUES (?);",
+			PreparedStatement statement = conn.prepareStatement("INSERT INTO fas_message (TEXT) VALUES (?);",
 					Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, "");
 			// High-TS
 			// statement.setTimestamp(1, new Timestamp(-1));
 			statement.execute();
 			result = statement.getGeneratedKeys();
-
 			if (result.next() && result != null) {
 				msg.setId(Long.valueOf(result.getInt(1)));
 				msg.setMsg_date(0); // Erstellungsdatum
@@ -42,13 +41,20 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 				// acc.setLastTime(1429303464l);
 			}
 
-		} catch (SQLException e) {
-			e.printStackTrace();
+
+			//Message direkt in die Datenbank richtig formatiert speichern
+			//Muss noch mit ins Insert intigriert werden
+			persist(msg);
+			statement.close();
+			System.out.println("Message angelegt!");
 		}
-		//Message direkt in die Datenbank richtig formatiert speichern
-		//Muss noch mit ins Insert intigriert werden
-		persist(msg);
-		System.out.println("Message angelegt!");
+		finally {
+			if (conn instanceof Connection) {
+				conn.close();
+			}
+		}
+
+
 		return msg;
 	}
 
@@ -59,15 +65,15 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 	}
 
 	@Override
-	public List<Message> findAll() {
+	public List<Message> findAll() throws SQLException, ParseException{
 		List<Message> lMsg = new ArrayList<Message>();
 
-		Connection conn = DBUtil.getConnection();
-		PreparedStatement statement;
-		ResultSet result;
-		SimpleDateFormat tf = new SimpleDateFormat("yyyy-MM-DD HH:MM:SS");
+		Connection conn = null;
 		try {
-			statement = conn.prepareStatement("SELECT * FROM fas_message;");
+			conn = DBUtil.getConnection();
+			PreparedStatement statement = conn.prepareStatement("SELECT * FROM fas_message;");
+			ResultSet result;
+			SimpleDateFormat tf = new SimpleDateFormat("yyyy-MM-DD HH:MM:SS");
 			result = statement.executeQuery();
 
 			while (result.next()) {
@@ -80,27 +86,27 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 				// msg.setLastTime(result.getLong(5));
 				lMsg.add(msg);
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			statement.close();
+		}
+		finally {
+			if (conn instanceof Connection) {
+				conn.close();
+			}
 		}
 
 		return lMsg;
 	}
 
 	@Override
-	public Message getById(long id) throws SQLException {
+	public Message getById(long id) throws SQLException, ParseException {
 		Message msg = new Message();
-		Connection conn = DBUtil.getConnection();
-		PreparedStatement statement;
-		ResultSet result;
-
-		SimpleDateFormat tf = new SimpleDateFormat("yyyy-MM-DD HH:MM:SS");
-
+		Connection conn = null;
 		try {
-			statement = conn.prepareStatement("SELECT * FROM fas_message WHERE id = " + id + ";");
+			conn = DBUtil.getConnection();
+
+			PreparedStatement statement =  conn.prepareStatement("SELECT * FROM fas_message WHERE id = " + id + ";");
+			ResultSet result;
+			SimpleDateFormat tf = new SimpleDateFormat("yyyy-MM-DD HH:MM:SS");
 			result = statement.executeQuery();
 
 			while (result.next()) {
@@ -111,25 +117,29 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 				// msg.setLastTime(result.getLong(5));
 				return msg;
 			}
-		} catch (SQLException | ParseException e) {
-			e.printStackTrace();
+			statement.close();
+		}
+		finally {
+			if (conn instanceof Connection) {
+				conn.close();
+			}
 		}
 
 		return null;
 	}
 
 	// Klassenspezifische Methode
-	public Message getLastMsg() throws SQLException {
+	public Message getLastMsg() throws SQLException, ParseException {
 		Message msg = new Message();
-		Connection conn = DBUtil.getConnection();
-		PreparedStatement statement;
-		ResultSet result;
-
-		SimpleDateFormat tf = new SimpleDateFormat("yyyy-MM-DD HH:MM:SS");
+		Connection conn = null;
 
 		try {
-			statement = conn.prepareStatement("SELECT * FROM fas_message" 
-							+ " ORDER BY MSG_DATE DESC" + ";");
+			conn = DBUtil.getConnection();
+			PreparedStatement statement = conn.prepareStatement("SELECT * FROM fas_message"
+					+ " ORDER BY MSG_DATE DESC" + ";");
+			ResultSet result;
+
+			SimpleDateFormat tf = new SimpleDateFormat("yyyy-MM-DD HH:MM:SS");
 			result = statement.executeQuery();
 
 			while (result.next()) {
@@ -140,8 +150,12 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 				// msg.setLastTime(result.getLong(5));
 				return msg;
 			}
-		} catch (SQLException | ParseException e) {
-			e.printStackTrace();
+			statement.close();
+		}
+		finally {
+			if (conn instanceof Connection) {
+				conn.close();
+			}
 		}
 
 		return null;
@@ -149,22 +163,23 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 
 	@Override
 	public void persist(Message entity) throws SQLException {
-		Connection conn = DBUtil.getConnection();
-		PreparedStatement statement;
+
+
+		Connection conn = null;
 		try {
-			statement = conn.prepareStatement(
+			conn = DBUtil.getConnection();
+			PreparedStatement statement = conn.prepareStatement(
 					"UPDATE fas_message SET " + "TEXT = ?, HISTORISIERT = ? " + "WHERE id = " + entity.getId());
 			statement.setString(1, entity.getMsg_text());
 			statement.setTimestamp(2, new Timestamp(entity.getHistorisiert()));
 			// statement.setLong(4, entity.getLastTime());
 			statement.execute();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
+
+			statement.close();
+		}
+		finally {
+			if (conn instanceof Connection) {
 				conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
 			}
 		}
 	}

@@ -1,13 +1,14 @@
 package util;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 
 import persistence.dao.impl.MessageDAO;
 import persistence.entity.impl.Message;
 
 public class Test_App {
 
-	public static void main(String[] args) throws SQLException {
+	public static void main(String[] args) throws SQLException, ParseException {
 //		Server-Start
 //		Endpoint.publish("http://localhost:8080/ws/hello", 
 //				new HelloWorldImpl());
