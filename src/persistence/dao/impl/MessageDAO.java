@@ -65,7 +65,7 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 	}
 
 	@Override
-	public List<Message> findAll() throws SQLException, ParseException{
+	public List<Message> findAll() throws SQLException{
 		List<Message> lMsg = new ArrayList<Message>();
 
 		Connection conn = null;
@@ -76,15 +76,20 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 			SimpleDateFormat tf = new SimpleDateFormat("yyyy-MM-DD HH:MM:SS");
 			result = statement.executeQuery();
 
-			while (result.next()) {
-				// KIP Deklaration vll vor der Schleife? Performance
-				Message msg = new Message();
-				msg.setId(Long.valueOf(result.getInt(1)));
-				msg.setMsg_date(tf.parse(result.getString(2)).getTime());
-				msg.setMsg_text(result.getString(3));
-				msg.setHistorisiert(tf.parse(result.getString(4)).getTime());
-				// msg.setLastTime(result.getLong(5));
-				lMsg.add(msg);
+			try {
+				while (result.next()) {
+					// KIP Deklaration vll vor der Schleife? Performance
+					Message msg = new Message();
+					msg.setId(Long.valueOf(result.getInt(1)));
+					msg.setMsg_date(tf.parse(result.getString(2)).getTime());
+					msg.setMsg_text(result.getString(3));
+					msg.setHistorisiert(tf.parse(result.getString(4)).getTime());
+					// msg.setLastTime(result.getLong(5));
+					lMsg.add(msg);
+				}
+			}
+			catch (ParseException p) {
+				p.printStackTrace();
 			}
 			statement.close();
 		}
@@ -98,7 +103,7 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 	}
 
 	@Override
-	public Message getById(long id) throws SQLException, ParseException {
+	public Message getById(long id) throws SQLException{
 		Message msg = new Message();
 		Connection conn = null;
 		try {
@@ -109,13 +114,18 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 			SimpleDateFormat tf = new SimpleDateFormat("yyyy-MM-DD HH:MM:SS");
 			result = statement.executeQuery();
 
-			while (result.next()) {
-				msg.setId(Long.valueOf(result.getInt(1)));
-				msg.setMsg_date(tf.parse(result.getString(2)).getTime());
-				msg.setMsg_text(result.getString(3));
-				msg.setHistorisiert(tf.parse(result.getString(4)).getTime());
-				// msg.setLastTime(result.getLong(5));
-				return msg;
+			try {
+				while (result.next()) {
+					msg.setId(Long.valueOf(result.getInt(1)));
+					msg.setMsg_date(tf.parse(result.getString(2)).getTime());
+					msg.setMsg_text(result.getString(3));
+					msg.setHistorisiert(tf.parse(result.getString(4)).getTime());
+					// msg.setLastTime(result.getLong(5));
+					return msg;
+				}
+			}
+			catch (ParseException p) {
+				p.printStackTrace();
 			}
 			statement.close();
 		}
@@ -129,7 +139,7 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 	}
 
 	// Klassenspezifische Methode
-	public Message getLastMsg() throws SQLException, ParseException {
+	public Message getLastMsg() throws SQLException {
 		Message msg = new Message();
 		Connection conn = null;
 
@@ -142,14 +152,20 @@ public class MessageDAO extends AbstractDAO<Message> implements IDAO<Message> {
 			SimpleDateFormat tf = new SimpleDateFormat("yyyy-MM-DD HH:MM:SS");
 			result = statement.executeQuery();
 
-			while (result.next()) {
-				msg.setId(Long.valueOf(result.getInt(1)));
-				msg.setMsg_date(tf.parse(result.getString(2)).getTime());
-				msg.setMsg_text(result.getString(3));
-				msg.setHistorisiert(tf.parse(result.getString(4)).getTime());
-				// msg.setLastTime(result.getLong(5));
-				return msg;
+			try {
+				while (result.next()) {
+					msg.setId(Long.valueOf(result.getInt(1)));
+					msg.setMsg_date(tf.parse(result.getString(2)).getTime());
+					msg.setMsg_text(result.getString(3));
+					msg.setHistorisiert(tf.parse(result.getString(4)).getTime());
+					// msg.setLastTime(result.getLong(5));
+					return msg;
+				}
 			}
+			catch (ParseException p) {
+				p.printStackTrace();
+			}
+
 			statement.close();
 		}
 		finally {
